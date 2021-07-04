@@ -1,5 +1,6 @@
 extends Area2D
 
+
 const SPEED = 250
 var velocity = Vector2()
 var direcao = 1
@@ -21,10 +22,6 @@ func _on_VisibilityNotifier2D_screen_exited():
 
 
 func _on_beam_body_entered(body):
-	if "nake" in body.name:
-		body.dead()
 	if "player" in body.name:
-		body.dead()
-	if "bot" in body.name:
 		body.dead()
 	queue_free()

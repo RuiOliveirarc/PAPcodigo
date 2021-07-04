@@ -3,6 +3,8 @@ extends KinematicBody2D
 var anim_mode= "idle"
 var animation 
 var facing_right = true
+var vida = 3
+var x = 0
 
 
 
@@ -69,7 +71,7 @@ func _physics_process(delta):
 		if is_on_floor():
 			on_ground = true
 		else:
-			anim_mode="fall"
+			anim_mode= "fall"
 			on_ground = false
 		
 		velocity = move_and_slide(velocity , FLOOR)
@@ -77,38 +79,103 @@ func _physics_process(delta):
 		
 		
 		#se o player tocar na cobra morre
-		if get_slide_count() >0:
+		if get_slide_count() > 0:
 			for i in range(get_slide_count()):
 				if "Snake" in get_slide_collision(i).collider.name:
-					dead() 
+					velocity.y=jumpower
+					dead()
+					get_slide_collision(i).collider.mudardirecaosnake()
 	#animaçoes
 		animation = anim_mode
 		anim_mode= "idle"
 		get_node("AnimationPlayer").play(animation)
+
+
+
 #funcão para matar o player
 func dead():
-	is_dead=true
-	anim_mode="die"
-	animation = anim_mode
-	get_node("AnimationPlayer").play(animation)
-	velocity=Vector2(0,0)
-	$CollisionShape2D.disabled=true
-	$Timer.start()
+	#vidas
+	vida -= 1
+	if (vida==1):
+		$vida_time.start()
+	else:
+		$vida_time2.start()
 	
+	get_node("Camera2D/vida_sprite").frame += 1
+	if(vida == 0):
+		is_dead=true
+		anim_mode="die"
+		animation = anim_mode
+		get_node("AnimationPlayer").play(animation)
+		velocity=Vector2(0,0)
+		$CollisionShape2D.disabled=true
+		$Timer.start()
+
 
 
 func _on_Timer_timeout():
-	#x=get_tree().get_current_scene().get_name()
 	get_node("AnimationPlayer").play("gameover")
 	$Timer2.start()
 	
-	
-
 
 
 func _on_falllzone_body_entered(body):
-	get_tree().change_scene("res://lvl1.tscn")
+	dead()
+	dead()
+	dead()
 
 
 func _on_Timer2_timeout():
-	get_tree().change_scene("res://lvl1.tscn")
+	get_tree().reload_current_scene()
+	#get_tree().change_scene("res://lvl1.tscn")
+
+
+func _on_nextlvl_body_entered(body):
+	get_tree().change_scene("res://lvl2.tscn")
+
+
+
+func _on_lvl2hurt1_body_entered(body):
+	dead()
+	dead()
+	dead()
+
+
+func _on_Area2D_body_entered(body):
+	dead()
+	dead()
+	dead()
+
+
+func _on_vida_time_timeout():
+	x += 1
+	if( x % 2 == 0):
+		get_node("Sprite").visible = true
+	else:
+		get_node("Sprite").visible = false
+	if (x == 7):
+		get_node("Sprite").visible = true
+		x=0
+		$vida_time.stop()
+	else:
+		$vida_time.start()
+
+
+
+func _on_vida_time2_timeout():
+	x += 1
+	if( x % 2 == 0):
+		get_node("Sprite").visible = true
+	else:
+		get_node("Sprite").visible = false
+	if (x == 7):
+		get_node("Sprite").visible = true
+		x=0
+		$vida_time2.stop()
+	else:
+		$vida_time2.start()
+
+
+
+func _on_nextlvl2_body_entered(body):
+	get_tree().change_scene("res://lvl3.tscn")

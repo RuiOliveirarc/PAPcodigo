@@ -44,13 +44,11 @@ func _physics_process(delta):
 	
 	#se tocar na parede vira para o outro lado
 	if is_on_wall():
-		direction= direction * -1
-		$RayCast2D.position.x *= -1
+		mudardirecaosnake()
 	
 	#se chegar a ponta do chao em vez de cair,vira para outro lado
 	if $RayCast2D.is_colliding() ==false:
-		direction=direction * -1
-		$RayCast2D.position.x *= -1
+		mudardirecaosnake()
 	
 	#se a cobra tocar no player mata-o
 	if get_slide_count() > 0:
@@ -64,6 +62,14 @@ func _physics_process(delta):
 	anim_mode= "walk"
 	get_node("AnimationPlayer").play(animation)
 
+func mudardirecaosnake():
+	direction=direction * -1
+	$RayCast2D.position.x *= -1
 
 func _on_Timer_timeout():
 	queue_free()
+
+
+func _on_head_body_entered(body):
+	if body.name=="player":
+		dead()
